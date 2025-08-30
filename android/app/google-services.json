@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "287835880766",
+    "project_id": "sinsang-f4029",
+    "storage_bucket": "sinsang-f4029.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:287835880766:android:f9b493066cabe786b7806f",
+        "android_client_info": {
+          "package_name": "com.example.untitled"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDf3vQWK8LWp-ogdKrDSVNnSscjENc924c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
