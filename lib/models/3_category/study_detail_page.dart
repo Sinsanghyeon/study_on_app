@@ -22,7 +22,6 @@ class _StudyDetailPageState extends State<StudyDetailPage> {
   @override
   void initState() {
     super.initState();
-    // [수정] studyData에 'type' 필드가 '오프라인'일 때만 지도 데이터 로드
     if (widget.studyData['type'] == '오프라인') {
       _loadMapData();
     }
@@ -33,7 +32,6 @@ class _StudyDetailPageState extends State<StudyDetailPage> {
     if (locationString.isEmpty) return;
 
     try {
-      // geocoding을 사용하여 주소 -> 좌표 변환
       List<Location> locations = await locationFromAddress(locationString);
       if (locations.isNotEmpty) {
         final location = locations.first;
@@ -89,7 +87,7 @@ class _StudyDetailPageState extends State<StudyDetailPage> {
               Navigator.pop(ctx);
               try {
                 final userDoc = await FirebaseFirestore.instance.collection('users').doc(currentUser.uid).get();
-                final applicantNickname = userDoc.data()?['displayName'] as String? ?? '이름없음';
+                final applicantNickname = userDoc.data()?['displayName'] ?? '이름없음';
 
                 await FirebaseFirestore.instance.collection('applications').add({
                   'studyId': widget.studyId,
@@ -132,7 +130,7 @@ class _StudyDetailPageState extends State<StudyDetailPage> {
           const SizedBox(height: 8),
           Text(title, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600)),
           const SizedBox(height: 4),
-          Text(content, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+          Text(content, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
         ],
       ),
     );
@@ -141,7 +139,6 @@ class _StudyDetailPageState extends State<StudyDetailPage> {
   @override
   Widget build(BuildContext context) {
     final String title = widget.studyData['title'] ?? '제목 없음';
-    // [수정] description 필드명을 desc에서 description으로 변경 (생성 페이지와 통일)
     final String description = widget.studyData['description'] ?? '소개글이 없습니다.';
     final String category = widget.studyData['category'] ?? '';
     final String leaderNickname = widget.studyData['leaderNickname'] ?? '정보 없음';
@@ -149,7 +146,6 @@ class _StudyDetailPageState extends State<StudyDetailPage> {
     final int memberCount = widget.studyData['memberCount'] ?? 1;
     final int maxMembers = widget.studyData['maxMembers'] ?? 0;
     final bool isRecruiting = widget.studyData['isRecruiting'] ?? true;
-    // [수정] 진행 방식과 위치 정보를 변수로 선언
     final String studyType = widget.studyData['type'] ?? '온라인';
     final String location = studyType == '오프라인' ? '${widget.studyData['location'] ?? '장소 미정'}' : '온라인';
 
@@ -159,10 +155,8 @@ class _StudyDetailPageState extends State<StudyDetailPage> {
       final now = DateTime.now();
       final difference = deadline.difference(DateTime(now.year, now.month, now.day)).inDays;
 
-      if (difference == 0) {
-        deadlineText = '오늘 마감!';
-      } else if (difference > 0) {
-        deadlineText = 'D-$difference';
+      if (difference >= 0) {
+        deadlineText = 'D-${difference + 1}';
       } else {
         deadlineText = '모집 마감';
       }
@@ -237,14 +231,12 @@ class _StudyDetailPageState extends State<StudyDetailPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       _buildHighlightInfo(context, icon: Icons.people_alt_outlined, title: '모집 현황', content: '$memberCount/$maxMembers 명'),
-                      // [수정] 진행 방식과 위치 정보를 표시하도록 수정
                       _buildHighlightInfo(context, icon: studyType == '온라인' ? Icons.laptop_mac_outlined : Icons.location_on_outlined, title: '진행 방식', content: location),
                       _buildHighlightInfo(context, icon: Icons.event_available_outlined, title: '모집 마감', content: deadlineText),
                     ],
                   ),
                 ),
               ),
-              // [수정] 오프라인 스터디이고, 지도 좌표가 성공적으로 로드되었을 때만 지도를 표시
               if (studyType == '오프라인' && _studyLocation != null) ...[
                 const SizedBox(height: 32),
                 Text('📍 스터디 장소', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),

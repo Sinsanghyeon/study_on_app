@@ -15,17 +15,14 @@ class _StudyCreationPageState extends State<StudyCreationPage> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  // [추가] 오프라인 스터디 장소 입력을 위한 컨트롤러
   final _locationController = TextEditingController();
 
   String? _selectedCategory;
   int _maxMembers = 2;
   DateTime? _deadline;
   bool _isLoading = false;
-  // [추가] 스터디 진행 방식을 저장할 변수 (기본값 '온라인')
   String _studyType = '온라인';
 
-  // [추가] 컨트롤러 메모리 해제를 위한 dispose 메서드
   @override
   void dispose() {
     _titleController.dispose();
@@ -63,7 +60,6 @@ class _StudyCreationPageState extends State<StudyCreationPage> {
         'title': _titleController.text.trim(),
         'description': _descriptionController.text.trim(),
         'category': _selectedCategory,
-        // [추가] 진행 방식과 장소 정보를 Firestore에 저장
         'type': _studyType,
         'location': _studyType == '오프라인' ? _locationController.text.trim() : null,
         'leaderId': currentUser.uid,
@@ -135,6 +131,7 @@ class _StudyCreationPageState extends State<StudyCreationPage> {
                   hint: const Text('카테고리 선택'),
                   items: studyCategories.values
                       .expand((subList) => subList)
+                      .toSet() // 중복 제거
                       .map((category) => DropdownMenuItem(value: category, child: Text(category)))
                       .toList(),
                   onChanged: (value) => setState(() => _selectedCategory = value),
@@ -148,11 +145,8 @@ class _StudyCreationPageState extends State<StudyCreationPage> {
                   validator: (value) => value!.trim().isEmpty ? '설명을 입력해주세요.' : null,
                 ),
                 const SizedBox(height: 24),
-
-                // [추가] 진행 방식 선택 UI
                 _buildSectionTitle('진행 방식'),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Radio<String>(
                       value: '온라인',
@@ -169,7 +163,6 @@ class _StudyCreationPageState extends State<StudyCreationPage> {
                     const Text('오프라인'),
                   ],
                 ),
-                // [추가] 오프라인 선택 시에만 장소 입력 필드 표시
                 if (_studyType == '오프라인')
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
@@ -188,7 +181,6 @@ class _StudyCreationPageState extends State<StudyCreationPage> {
                     ),
                   ),
                 const SizedBox(height: 24),
-
                 _buildSectionTitle('모집 정보'),
                 Row(
                   children: [
@@ -196,7 +188,7 @@ class _StudyCreationPageState extends State<StudyCreationPage> {
                     const SizedBox(width: 16),
                     DropdownButton<int>(
                       value: _maxMembers,
-                      items: List.generate(9, (i) => i + 2) // 2명부터 10명까지
+                      items: List.generate(9, (i) => i + 2)
                           .map((num) => DropdownMenuItem(value: num, child: Text('$num 명')))
                           .toList(),
                       onChanged: (value) => setState(() => _maxMembers = value!),

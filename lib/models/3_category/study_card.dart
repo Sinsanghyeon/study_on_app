@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 import 'study_detail_page.dart';
 
 class StudyCard extends StatelessWidget {
@@ -17,10 +16,8 @@ class StudyCard extends StatelessWidget {
     final memberCount = studyData['memberCount'] ?? 0;
     final maxMembers = studyData['maxMembers'] ?? 1;
     final deadline = (studyData['deadline'] as Timestamp?)?.toDate();
-    // [추가] 진행 방식과 장소 데이터 가져오기
     final type = studyData['type'] ?? '온라인';
     final location = studyData['location'] ?? '장소 미정';
-
 
     String dDay = '마감';
     Color dDayColor = Colors.grey;
@@ -36,7 +33,7 @@ class StudyCard extends StatelessWidget {
       elevation: 4,
       shadowColor: Colors.black.withOpacity(0.1),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: InkWell(
         onTap: () {
           Navigator.push(
@@ -51,10 +48,10 @@ class StudyCard extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -64,12 +61,18 @@ class StudyCard extends StatelessWidget {
                     ),
                     child: Text(dDay, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
                   ),
-                  Chip(
-                    label: Text(category, style: TextStyle(color: Colors.teal.shade800, fontSize: 12)),
-                    backgroundColor: Colors.teal.withOpacity(0.1),
-                    side: BorderSide.none,
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Chip(
+                        label: Text(category, style: TextStyle(color: Colors.teal.shade800, fontSize: 12)),
+                        backgroundColor: Colors.teal.withOpacity(0.1),
+                        side: BorderSide.none,
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -80,36 +83,30 @@ class StudyCard extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              const SizedBox(height: 16),
+              _buildInfoRow(Icons.person_outline, leaderNickname),
+              const SizedBox(height: 6),
+              _buildInfoRow(
+                type == '온라인' ? Icons.laptop_mac_outlined : Icons.location_on_outlined,
+                type == '온라인' ? '온라인' : location,
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildInfoRow(Icons.person_outline, leaderNickname),
-                  const SizedBox(height: 4),
-                  // [수정] 마감일 정보와 위치 정보를 한 줄에 표시하도록 변경
-                  _buildInfoRow(
-                    type == '온라인' ? Icons.laptop_mac_outlined : Icons.location_on_outlined,
-                    type == '온라인' ? '온라인' : location,
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('참여 현황', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                      Text('$memberCount / $maxMembers 명', style: const TextStyle(fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: LinearProgressIndicator(
-                      value: maxMembers > 0 ? memberCount / maxMembers : 0,
-                      minHeight: 8,
-                      backgroundColor: Colors.grey[200],
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.teal.shade300),
-                    ),
-                  ),
+                  const Text('참여 현황', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                  Text('$memberCount / $maxMembers 명', style: const TextStyle(fontWeight: FontWeight.bold)),
                 ],
+              ),
+              const SizedBox(height: 4),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: LinearProgressIndicator(
+                  value: maxMembers > 0 ? memberCount / maxMembers : 0,
+                  minHeight: 8,
+                  backgroundColor: Colors.grey[200],
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.teal.shade300),
+                ),
               ),
             ],
           ),
@@ -123,7 +120,6 @@ class StudyCard extends StatelessWidget {
       children: [
         Icon(icon, size: 14, color: Colors.grey.shade600),
         const SizedBox(width: 6),
-        // [수정] 텍스트가 길어질 경우를 대비해 Expanded와 ellipsis 처리 추가
         Expanded(
           child: Text(
             text,
