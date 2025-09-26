@@ -171,7 +171,7 @@ API 키 생성:
 생성된 API 키를 안전한 곳에 복사해 둡니다.
 
 ------------------------------------------
-3단계: Android 및 iOS 설정
+3단계: Android 설정
 발급받은 API 키를 각 플랫폼(Android/iOS)에 등록해야 합니다.
 
 Android 설정
@@ -183,38 +183,16 @@ XML
 
 <manifest ...>
   <application ...>
-    <meta-data android:name="com.google.android.geo.API_KEY"
-               android:value="YOUR_API_KEY"/>
+     ✅ ✅ <meta-data android:name="com.google.android.geo.API_KEY"
+               android:value="YOUR_API_KEY"/>  ✅ ✅
 
     <activity ...>
       </activity>
   </application>
 </manifest>
-iOS 설정
-ios/Runner/AppDelegate.swift 파일을 엽니다.
 
-import Flutter 아래에 import GoogleMaps를 추가하고, didFinishLaunchingWithOptions 함수 안에 API 키를 등록하는 코드를 추가합니다. YOUR_API_KEY 부분을 실제 키로 교체해주세요.
+XML
 
-Swift
-
-import Flutter
-import UIKit
-import GoogleMaps // <--- 이 라인 추가
-
-@main
-@objc class AppDelegate: FlutterAppDelegate {
-  override func application(
-    _ application: UIApplication,
-    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
-  ) -> Bool {
-    // ✅✅✅ 이 부분을 추가하세요 ✅✅✅
-    GMSServices.provideAPIKey("YOUR_API_KEY") 
-    // ✅✅✅ 여기까지 추가 ✅✅✅
-
-    GeneratedPluginRegistrant.register(with: self)
-    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
-  }
-}
 
 -------------------------------------------------
 4단계: 스터디 상세 페이지 코드 수정
