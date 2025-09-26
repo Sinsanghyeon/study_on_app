@@ -250,15 +250,16 @@ functions/main.py 파일 수정:
 <details>
 <summary><b>🐍 main.py 전체 코드 보기 (클릭하여 펼치기)</b></summary>
 
-Python
-
+# main.py
 import os
 from firebase_admin import initialize_app, firestore
 from firebase_functions import https_fn
 import google.generativeai as genai
 
+# Firebase 앱 초기화
 initialize_app()
 
+# Firebase 환경 변수에서 API 키를 가져옵니다.
 gemini_api_key = os.environ.get("GEMINI_KEY")
 if gemini_api_key:
     genai.configure(api_key=gemini_api_key)
@@ -270,15 +271,26 @@ def summarizeChat(req: https_fn.CallableRequest) -> https_fn.Response:
     """스터디 채팅 내용을 요약하여 회의록을 생성합니다."""
 
     if not gemini_api_key:
-        raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.INTERNAL, message="Gemini API 키가 서버에 설정되지 않았습니다.")
+        raise https_fn.HttpsError(
+            code=https_fn.FunctionsErrorCode.INTERNAL,
+            message="Gemini API 키가 서버에 설정되지 않았습니다."
+        )
+
     if req.auth is None:
-        raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.UNAUTHENTICATED, message="인증된 사용자만 이 기능을 사용할 수 있습니다.")
+        raise https_fn.HttpsError(
+            code=https_fn.FunctionsErrorCode.UNAUTHENTICATED,
+            message="인증된 사용자만 이 기능을 사용할 수 있습니다."
+        )
 
     study_group_id = req.data.get("studyGroupId")
     if not study_group_id:
-        raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.INVALID_ARGUMENT, message="스터디 그룹 ID가 필요합니다.")
+        raise https_fn.HttpsError(
+            code=https_fn.FunctionsErrorCode.INVALID_ARGUMENT,
+            message="스터디 그룹 ID가 필요합니다."
+        )
 
     db = firestore.client()
+
     messages_ref = db.collection("chats").document(study_group_id).collection("messages").order_by("timestamp").stream()
 
     chat_history = ""
@@ -314,9 +326,10 @@ def summarizeChat(req: https_fn.CallableRequest) -> https_fn.Response:
         return response.text
     except Exception as e:
         print(f"Gemini API 호출 중 오류 발생: {e}")
-        raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.INTERNAL, message="AI 모델을 호출하는 중 오류가 발생했습니다.")
-</details>
-
+        raise https_fn.HttpsError(
+            code=https_fn.FunctionsErrorCode.INTERNAL,
+            message="AI 모델을 호출하는 중 오류가 발생했습니다."
+        )
 라이브러리 수동 설치:
 
 Bash
