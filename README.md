@@ -133,7 +133,7 @@ JSON
 
 프로젝트의 루트 폴더에 있는 pubspec.yaml 파일을 엽니다.
 
-dependencies: 섹션에 아래 라인을 추가합니다. 기존의 flutter_naver_map 아래에 추가하면 됩니다.
+dependencies: 섹션에 아래 라인을 추가합니다.
 
 YAML
 
@@ -141,7 +141,6 @@ dependencies:
   flutter:
     sdk: flutter
   # ... 다른 패키지들 ...
-  flutter_naver_map: ^1.2.1
   google_maps_flutter: ^2.6.1 # <--- 이 라인을 추가하세요.
 파일을 저장한 뒤, 터미널에서 아래 명령어를 실행하여 패키지를 설치합니다.
 
